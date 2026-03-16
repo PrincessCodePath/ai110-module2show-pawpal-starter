@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 
 
 @dataclass
@@ -10,10 +11,26 @@ class Task:
     frequency: str = "daily"
     completed: bool = False
     pet: "Pet" = field(default=None, repr=False)
+    due_date: date | None = field(default=None, repr=False)
 
     def mark_complete(self) -> None:
-        """Set this task as completed."""
+        """Set this task as completed; create next occurrence if daily or weekly."""
         self.completed = True
+        if not self.pet or self.frequency not in ("daily", "weekly"):
+            return
+        base = self.due_date or date.today()
+        delta = timedelta(days=1) if self.frequency == "daily" else timedelta(days=7)
+        next_task = Task(
+            self.description,
+            self.time,
+            self.duration_mins,
+            self.priority,
+            self.frequency,
+            False,
+            self.pet,
+            base + delta,
+        )
+        self.pet.add_task(next_task)
 
 
 @dataclass
@@ -76,7 +93,35 @@ class Scheduler:
             task.pet.tasks.remove(task)
             task.pet = None
 
+    def sort_by_time(self) -> list[Task]:
+        """Return all tasks sorted by time (HH:MM)."""
+        return sorted(self.get_tasks(), key=lambda t: t.time)
+
+    def filter_tasks(
+        self,
+        completed: bool | None = None,
+        pet_name: str | None = None,
+    ) -> list[Task]:
+        """Return tasks filtered by completion status and/or pet name."""
+        tasks = self.get_tasks()
+        if completed is not None:
+            tasks = [t for t in tasks if t.completed == completed]
+        if pet_name is not None:
+            tasks = [t for t in tasks if t.pet and t.pet.name == pet_name]
+        return tasks
+
+    def check_conflicts(self) -> list[str]:
+        """Return warning messages for tasks scheduled at the same time."""
+        by_time: dict[str, list[Task]] = {}
+        for t in self.get_tasks():
+            by_time.setdefault(t.time, []).append(t)
+        warnings = []
+        for tm, group in by_time.items():
+            if len(group) > 1:
+                names = ", ".join(f"{t.description} ({t.pet.name})" if t.pet else t.description for t in group)
+                warnings.append(f"Conflict at {tm}: {names}")
+        return warnings
+
     def generate_daily_plan(self) -> list[Task]:
         """Return today's tasks sorted by time."""
-        tasks = self.get_tasks()
-        return sorted(tasks, key=lambda t: t.time)
+        return self.sort_by_time()

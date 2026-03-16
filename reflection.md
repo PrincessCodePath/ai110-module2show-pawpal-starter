@@ -67,8 +67,8 @@ classDiagram
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+- The conflict detector only flags tasks that share the same start time (e.g. both at 08:00). It does not detect overlaps when start times differ but durations cross over (e.g. one task 08:00–08:30 and another 08:15–08:25).
+- I chose this so the logic stays simple and we avoid flagging back to back tasks that are intentionally stacked. For a daily pet-care list, the main problem is two things at the same slot, not every possible minute of overlap. matches how we use it for a daily list, where the same start time is what matters. If we ever needed to catch every overlapping minute, we’d have to change the detector to compare start and end times instead of just the start time.
 
 ---
 

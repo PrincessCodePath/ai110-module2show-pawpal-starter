@@ -32,6 +32,10 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+### Smarter Scheduling
+
+The tasks can be sorted by time with `sort_by_time()`, or narrowed down by completion status or pet name using `filter_tasks(completed=..., pet_name=...)`. Daily and weekly tasks automatically create the next occurrence when you mark them complete. The scheduler also checks for conflicts and returns warnings when two or more tasks are scheduled at the same time.
+
 ### Suggested workflow
 
 1. Read the scenario carefully and identify requirements and edge cases.
