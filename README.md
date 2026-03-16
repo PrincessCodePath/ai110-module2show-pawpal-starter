@@ -36,6 +36,17 @@ pip install -r requirements.txt
 
 The tasks can be sorted by time with `sort_by_time()`, or narrowed down by completion status or pet name using `filter_tasks(completed=..., pet_name=...)`. Daily and weekly tasks automatically create the next occurrence when you mark them complete. The scheduler also checks for conflicts and returns warnings when two or more tasks are scheduled at the same time.
 
+### Testing PawPal+
+
+Command to run tests:
+
+```bash
+python -m pytest
+```
+
+The tests cover task completion status, adding tasks to pets, sorting by time, recurring daily tasks (next occurrence created on mark complete). It alos covers any detection of conflicts for duplicate times, and the edge case of a pet with no tasks (empty schedule, no conflicts). I would say my confidence in the system's reliability is a **4.5/5 stars** because I dont have tests for adding a pet or task in the browser and seeing it in the schedule. The core logic is checked, but the UI isn’t covered by automated tests.
+
+
 ### Suggested workflow
 
 1. Read the scenario carefully and identify requirements and edge cases.
