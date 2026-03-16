@@ -2,10 +2,54 @@
 
 ## 1. System Design
 
+Three core actions a user should be able to perform:
+
+1. Enter or add basic owner and pet information.
+2. Add and edit pet care tasks (at minimum duration and priority).
+3. Generate and view today's plan and see why that plan was chosen.
+
+UML (Mermaid.js class diagram):
+
+```mermaid
+classDiagram
+    class Owner {
+        +str name
+        +list~Pet~ pets
+        +add_pet(pet)
+        +remove_pet(pet)
+        +get_pets()
+    }
+    class Pet {
+        +str name
+        +str species
+        +Owner owner
+    }
+    class Task {
+        +str name
+        +int duration_mins
+        +int priority
+        +str task_type
+        +bool recurring
+    }
+    class Scheduler {
+        +Owner owner
+        +list~Task~ tasks
+        +add_task(task)
+        +remove_task(task)
+        +generate_daily_plan()
+    }
+    Owner "1" --> "*" Pet : has
+    Task --> Pet : for
+    Scheduler --> Owner : uses
+    Scheduler --> "*" Task : manages
+```
+
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+- Owner: Stores name and list of pets; adds, removes, and returns pets.
+- Pet: Stores name, species, and owner reference (dataclass).
+- Task: Stores name, duration_mins, priority, task_type, recurring flag, and pet reference (dataclass).
+- Scheduler: Stores owner and task list; adds tasks, removes tasks, and generates the daily plan.
 
 **b. Design changes**
 
