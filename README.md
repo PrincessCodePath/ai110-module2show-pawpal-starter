@@ -47,6 +47,11 @@ python -m pytest
 The tests cover task completion status, adding tasks to pets, sorting by time, recurring daily tasks (next occurrence created on mark complete). It alos covers any detection of conflicts for duplicate times, and the edge case of a pet with no tasks (empty schedule, no conflicts). I would say my confidence in the system's reliability is a **4.5/5 stars** because I dont have tests for adding a pet or task in the browser and seeing it in the schedule. The core logic is checked, but the UI isn’t covered by automated tests.
 
 
+### Demo
+
+
+![PawPal App](Streamlit-example.png)
+
 ### Suggested workflow
 
 1. Read the scenario carefully and identify requirements and edge cases.

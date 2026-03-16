@@ -72,15 +72,23 @@ if pets:
     with col4:
         priority_label = st.selectbox("Priority", ["high", "medium", "low"], index=0)
     priority_map = {"high": 1, "medium": 2, "low": 3}
-    selected_pet = st.selectbox("Pet", options=pets, format_func=lambda p: f"{p.name} ({p.species})")
+    pet_index = st.selectbox("Pet", range(len(pets)), format_func=lambda i: f"{pets[i].name} ({pets[i].species})")
+    selected_pet = pets[pet_index]
     if st.button("Add task"):
         task = Task(task_title.strip(), task_time, int(duration), priority_map[priority_label], pet=selected_pet)
         selected_pet.add_task(task)
         st.rerun()
 
-    all_tasks = st.session_state.owner.get_all_tasks()
+scheduler = Scheduler(st.session_state.owner)
+conflicts = scheduler.check_conflicts()
+if conflicts:
+    for msg in conflicts:
+        st.warning(msg)
+
+if pets:
+    all_tasks = scheduler.sort_by_time()
     if all_tasks:
-        st.write("Current tasks:")
+        st.write("Current tasks (by time)")
         rows = [{"Time": t.time, "Task": t.description, "Pet": t.pet.name if t.pet else "", "Mins": t.duration_mins, "Priority": t.priority} for t in all_tasks]
         st.table(rows)
     else:
@@ -91,13 +99,11 @@ else:
 st.divider()
 
 st.subheader("Build Schedule")
-scheduler = Scheduler(st.session_state.owner)
 if st.button("Generate schedule"):
     plan = scheduler.generate_daily_plan()
     if plan:
-        st.write("Today's Schedule")
-        for t in plan:
-            pet_name = t.pet.name if t.pet else ""
-            st.write(f"  {t.time} — {t.description} ({pet_name}) — {t.duration_mins} min")
+        st.success("Today's schedule")
+        rows = [{"Time": t.time, "Task": t.description, "Pet": t.pet.name if t.pet else "", "Mins": t.duration_mins} for t in plan]
+        st.table(rows)
     else:
         st.info("No tasks to schedule. Add pets and tasks above.")
